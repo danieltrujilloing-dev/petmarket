@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * - Operaciones numéricas (increment)
  */
 @SpringBootTest
-@ActiveProfiles("redis-test")
+@ActiveProfiles("integration-test")
 @DisplayName("Redis Cache Service")
 @Tag("integration")
 @Tag("redis")

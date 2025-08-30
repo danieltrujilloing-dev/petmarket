@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Rendimiento y timeouts
  */
 @SpringBootTest
-@ActiveProfiles("redis-test")
+@ActiveProfiles("integration-test")
 @DisplayName("Redis Unit Tests - PetMarket")
 @Tag("unit")
 @Tag("redis")

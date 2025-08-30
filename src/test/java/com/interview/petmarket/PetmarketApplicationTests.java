@@ -1,14 +1,17 @@
 package com.interview.petmarket;
 
-import com.interview.petmarket.config.BaseIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@SpringBootTest
+@ActiveProfiles("integration-test")
 @DisplayName("PetMarket Application Tests")
 @Tag("integration")
 @Tag("smoke")
-class PetmarketApplicationTests extends BaseIntegrationTest {
+class PetmarketApplicationTests {
 
 	@Test
 	@DisplayName("Should load Spring application context successfully")
