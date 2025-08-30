@@ -2,12 +2,18 @@
 
 Marketplace de productos para mascotas implementado con **Arquitectura Hexagonal**.
 
-## 🎯 Caso de Uso Implementado
+## 🎯 Casos de Uso Implementados
 
-### **Catálogo de Productos**
+### **1. Catálogo de Productos**
 - ✅ Listar productos con filtros (tipo, especie, rango de precio)
 - ✅ Cache de lectura con TTL configurable
 - ✅ Invalidación automática al crear/actualizar productos
+
+### **2. Carrito y Pedido** 
+- ✅ Agregar/quitar ítems al carrito (validaciones SOLID)
+- ✅ Checkout: crea pedido, reserva stock, calcula total
+- ✅ Strategy Pattern para pricing (precio base vs promo perro)
+- ✅ Publica evento OrderCreated (Kafka)
 
 ## 🏗️ Arquitectura
 
@@ -54,10 +60,20 @@ GET /api/v1/productos/tipo/Alimento      # Por tipo
 GET /api/v1/productos/especie/Perro      # Por especie
 ```
 
-### Gestión (invalida cache)
+### Carrito
 ```bash
-POST /api/v1/productos                   # Crear producto
-PUT  /api/v1/productos/{id}              # Actualizar producto
+GET    /api/v1/carritos/cliente/{id}           # Obtener carrito
+POST   /api/v1/carritos/cliente/{id}/items     # Agregar item
+PUT    /api/v1/carritos/cliente/{id}/items/{productId}  # Actualizar cantidad
+DELETE /api/v1/carritos/cliente/{id}/items/{productId}  # Eliminar item
+```
+
+### Pedidos
+```bash
+POST  /api/v1/pedidos/checkout/cliente/{id}    # Checkout (crear pedido)
+GET   /api/v1/pedidos/{id}                     # Obtener pedido
+PATCH /api/v1/pedidos/{id}/cancelar            # Cancelar pedido
+PATCH /api/v1/pedidos/{id}/estado              # Cambiar estado
 ```
 
 ## 📊 Entidades

@@ -1,9 +1,9 @@
 package com.interview.petmarket.domain.exceptions;
 
 /**
- * Excepción para datos inválidos de inventario
+ * Excepción lanzada cuando los datos de inventario son inválidos.
  */
-public class InvalidInventoryDataException extends DomainException {
+public class InvalidInventoryDataException extends RuntimeException {
     
     public InvalidInventoryDataException(String message) {
         super(message);
