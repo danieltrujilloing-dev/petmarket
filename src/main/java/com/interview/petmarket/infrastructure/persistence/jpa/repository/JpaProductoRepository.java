@@ -61,8 +61,8 @@ public interface JpaProductoRepository extends JpaRepository<ProductoEntity, Lon
            "AND (:especies IS NULL OR p.especie IN :especies) " +
            "AND (:precioMin IS NULL OR p.precio >= :precioMin) " +
            "AND (:precioMax IS NULL OR p.precio <= :precioMax) " +
-           "AND (:texto IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) " +
-           "     OR LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :texto, '%'))) " +
+           "AND (:texto IS NULL OR p.nombre LIKE CONCAT('%', :texto, '%') " +
+           "     OR p.descripcion LIKE CONCAT('%', :texto, '%')) " +
            "AND (:soloDisponibles = false OR (p.stock IS NOT NULL AND p.stock > 0)) " +
            "ORDER BY p.fechaActualizacion DESC")
     List<ProductoEntity> findWithFilters(

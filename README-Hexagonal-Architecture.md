@@ -22,7 +22,7 @@ src/main/java/com/interview/petmarket/
 │   │   ├── carrito/           # Agregado Carrito (compras)
 │   │   ├── pedido/            # Agregado Pedido (órdenes completadas)
 │   │   ├── inventario/        # Agregado Inventario (stock y reposición)
-│   │   ├── solicitud/         # Agregado SolicitudAdopción (adopciones)
+│   │   ├── adopcion/          # Agregado Adopción (solicitudes y procesamiento)
 │   │   └── common/            # Objetos base comunes (BaseEntity, ValueObject)
 │   ├── ports/                 # Contratos (interfaces)
 │   │   ├── in/                # Puertos de entrada (Use Cases) - POR IMPLEMENTAR
@@ -69,7 +69,7 @@ src/main/java/com/interview/petmarket/
   - `CrearProductoUseCase`, `ActualizarInventarioUseCase`
   - `RegistrarClienteUseCase`, `GestionarCarritoUseCase`
   - `ProcesarPedidoUseCase`, `CambiarEstadoPedidoUseCase`
-  - `SolicitarAdopcionUseCase`, `ProcesarSolicitudUseCase`
+  - `GestionarAdopcionUseCase` ✅ IMPLEMENTADO
 
 ### 3. **Infraestructura** (Adapters) 🔧 PARCIALMENTE IMPLEMENTADO
 - **Responsabilidad**: Detalles técnicos del marketplace
@@ -91,7 +91,7 @@ src/main/java/com/interview/petmarket/
   - 🔄 `/api/carritos` - Gestión de carritos de compra
   - 🔄 `/api/pedidos` - Procesamiento de órdenes
   - 🔄 `/api/inventario` - Consulta de stock disponible
-  - 🔄 `/api/adopciones` - Solicitudes de adopción
+  - ✅ `/api/adopciones` - Solicitudes de adopción (IMPLEMENTADO)
 
 ## 🔌 Puertos y Adaptadores
 
@@ -111,6 +111,12 @@ public interface ProcesarPedidoUseCase {
     Pedido crearPedido(Long clienteId);
     Pedido cambiarEstado(Long pedidoId, EstadoPedido nuevoEstado);
 }
+
+// ✅ YA IMPLEMENTADO
+public interface GestionarAdopcionUseCase {
+    SolicitudAdopcion crearSolicitudAdopcion(Long clienteId, String nombre, ...);
+    void procesarRespuestaRefugio(Long solicitudId, boolean aprobada, String observaciones);
+}
 ```
 
 ### Puertos de Salida (Driven Ports) - Marketplace
@@ -125,6 +131,13 @@ public interface ProductoRepositoryPort {
 public interface CarritoRepositoryPort {
     Carrito save(Carrito carrito);
     Optional<Carrito> findByClienteId(Long clienteId);
+}
+
+// ✅ YA IMPLEMENTADO
+public interface SolicitudAdopcionRepositoryPort {
+    SolicitudAdopcion save(SolicitudAdopcion solicitud);
+    Optional<SolicitudAdopcion> findById(Long id);
+    List<SolicitudAdopcion> findByEstado(EstadoSolicitudAdopcion estado);
 }
 
 // ✅ YA IMPLEMENTADO
@@ -145,6 +158,12 @@ public class ProductoController {
 public class CarritoController {
     // Convierte HTTP requests → GestionarCarritoUseCase
 }
+
+// ✅ YA IMPLEMENTADO
+@RestController
+public class AdopcionController {
+    // Convierte HTTP requests → GestionarAdopcionUseCase
+}
 ```
 
 ### Adaptadores de Salida
@@ -159,6 +178,12 @@ public class ProductoRepositoryAdapter implements ProductoRepositoryPort {
 @Component
 public class KafkaEventPublisherAdapter implements EventPublisherPort {
     // Publica eventos de dominio a Kafka
+}
+
+// ✅ YA IMPLEMENTADO
+@Repository
+public class SolicitudAdopcionRepositoryAdapter implements SolicitudAdopcionRepositoryPort {
+    // Convierte Use Cases → JPA/Database para adopciones
 }
 ```
 
@@ -315,8 +340,11 @@ public class MarketplaceBeanConfiguration {
 5. **Microservicios**: Separación por contextos de negocio
 
 ## 📊 **Métricas del Proyecto**
-- **21 archivos Java** en el dominio
-- **6 entidades principales** del marketplace
-- **8 tablas** en PostgreSQL con relaciones
+- **35+ archivos Java** en el dominio y aplicación
+- **7 entidades principales** del marketplace (incluye SolicitudAdopcion)
+- **9 tablas** en PostgreSQL con relaciones
+- **3 casos de uso completos** implementados (Catálogo, Carrito/Pedido, Adopciones)
+- **44 tests unitarios** con JUnit 5 y Mockito
+- **3 topics de Kafka** para eventos (AdoptionRequested/Approved/Rejected)
 - **0 dependencias circulares** en la arquitectura
 - **100% compilación** sin errores

@@ -1,26 +1,27 @@
 # Catálogo de Productos - PetMarket
 
-## 🎯 **Caso de Uso Implementado: Catálogo con Cache y Filtros**
+## 🎯 **Caso de Uso Implementado: Catálogo**
 
-Se ha implementado completamente el caso de uso del **catálogo de productos** siguiendo la arquitectura hexagonal, con cache de lectura Redis y invalidación automática.
+Se ha implementado completamente el **caso de uso #1: Catálogo** siguiendo la arquitectura hexagonal, con cache de lectura Redis y invalidación automática según especificaciones.
 
 ### ✅ **Funcionalidades Implementadas:**
 
 1. **📋 Listar productos con filtros**
-   - Tipo de producto (Alimento, Accesorio, Juguete, etc.)
-   - Especie animal (Perro, Gato, Ave, etc.) 
-   - Rango de precios (mínimo y máximo)
+   - **Tipo**: alimento/accesorio (según especificación)
+   - **Especie**: especie destino (Perro, Gato, Ave, etc.) 
+   - **Rango de precios**: mínimo y máximo
    - Búsqueda por texto (nombre y descripción)
-   - Solo productos activos/disponibles
+   - Solo productos activos
 
 2. **🚀 Cache de lectura con TTL configurable**
+   - **TTL configurable** según especificación
    - TTL por defecto: 15 minutos
    - Cache automático en todas las consultas
    - Claves de cache únicas por filtro
 
-3. **🔄 Invalidación automática de cache**
-   - Al crear productos nuevos
-   - Al actualizar productos existentes
+3. **🔄 Invalida la cache cuando se crea/actualiza un producto**
+   - ✅ **Al crear productos** → Invalida cache completo
+   - ✅ **Al actualizar productos** → Invalida cache completo
    - Al cambiar estado (activar/desactivar)
    - Al modificar stock que afecte disponibilidad
 

@@ -2,6 +2,7 @@ package com.interview.petmarket.web.controller;
 
 import com.interview.petmarket.domain.ports.in.ProcesarPedidoUseCase;
 import com.interview.petmarket.domain.model.pedido.Pedido;
+import com.interview.petmarket.domain.ports.in.GestionarInventarioUseCase;
 import com.interview.petmarket.web.dto.PedidoResponseDto;
 import com.interview.petmarket.web.mapper.PedidoWebMapper;
 import org.slf4j.Logger;
@@ -25,14 +26,41 @@ public class PedidoController {
     
     private final ProcesarPedidoUseCase pedidoService;
     private final PedidoWebMapper webMapper;
+    private final GestionarInventarioUseCase inventarioService;
     
-    public PedidoController(ProcesarPedidoUseCase pedidoService, PedidoWebMapper webMapper) {
+    public PedidoController(ProcesarPedidoUseCase pedidoService, 
+                           PedidoWebMapper webMapper,
+                           GestionarInventarioUseCase inventarioService) {
         this.pedidoService = pedidoService;
         this.webMapper = webMapper;
+        this.inventarioService = inventarioService;
     }
     
     /**
-     * Realiza el checkout del carrito creando un pedido.
+     * Realiza el checkout del carrito creando un pedido (con query parameter).
+     * POST /api/v1/pedidos/checkout?clienteId=123
+     */
+    @PostMapping("/checkout")
+    public ResponseEntity<PedidoResponseDto> realizarCheckoutQuery(@RequestParam Long clienteId) {
+        logger.info("POST /api/v1/pedidos/checkout?clienteId={} - Iniciando checkout", clienteId);
+        
+        try {
+            Pedido pedido = pedidoService.realizarCheckout(clienteId);
+            PedidoResponseDto response = webMapper.toResponseDto(pedido);
+            
+            logger.info("Checkout completado exitosamente - Pedido: {}, Cliente: {}, Total: {}", 
+                       pedido.getId(), clienteId, pedido.getTotal());
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            
+        } catch (Exception e) {
+            logger.error("Error en checkout - Cliente: {}, Error: {}", clienteId, e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Realiza el checkout del carrito creando un pedido (con path parameter - LEGACY).
      * POST /api/v1/pedidos/checkout/cliente/{clienteId}
      * 
      * Proceso completo:
@@ -132,6 +160,52 @@ public class PedidoController {
         } catch (Exception e) {
             logger.error("Error cambiando estado del pedido {}: {}", pedidoId, e.getMessage());
             throw e;
+        }
+    }
+    
+    /**
+     * Confirma el pago de un pedido.
+     * POST /api/v1/pedidos/{id}/pago
+     * 
+     * Proceso:
+     * 1. Cambia estado del pedido a PAGADO
+     * 2. Confirma stock definitivo (dispara lógica de inventario)
+     * 3. Emite evento LowStock si aplica
+     */
+    @PostMapping("/{pedidoId}/pago")
+    public ResponseEntity<Map<String, String>> confirmarPago(@PathVariable Long pedidoId) {
+        logger.info("POST /api/v1/pedidos/{}/pago - Confirmando pago", pedidoId);
+        
+        try {
+            // 1. Cambiar estado del pedido a PAGADO
+            Pedido pedido = pedidoService.cambiarEstadoPedido(pedidoId, "PAGADO");
+            
+            // 2. Confirmar stock definitivo (dispara lógica de stock y LowStock)
+            inventarioService.confirmarStockPorPago(pedidoId);
+            
+            logger.info("Pago confirmado exitosamente - Pedido: {}, Estado: {}", 
+                       pedidoId, pedido.getEstado());
+            
+            Map<String, String> response = Map.of(
+                    "message", "Payment confirmed successfully",
+                    "pedidoId", pedidoId.toString(),
+                    "estado", pedido.getEstado().toString(),
+                    "timestamp", java.time.LocalDateTime.now().toString()
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("Error confirmando pago del pedido {}: {}", pedidoId, e.getMessage());
+            
+            Map<String, String> errorResponse = Map.of(
+                    "error", "Payment confirmation failed",
+                    "message", e.getMessage(),
+                    "pedidoId", pedidoId.toString(),
+                    "timestamp", java.time.LocalDateTime.now().toString()
+            );
+            
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
     

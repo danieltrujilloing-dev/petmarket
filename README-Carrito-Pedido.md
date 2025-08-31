@@ -10,13 +10,12 @@
 - ✅ **Limpiar carrito completo**
 
 ### **2. Proceso de Checkout**
-- ✅ **Validación de carrito no vacío**
-- ✅ **Validación de stock disponible**
-- ✅ **Reserva automática de stock** (disminuye inventario)
-- ✅ **Cálculo de total con Strategy Pattern**
-- ✅ **Creación de pedido**
+- ✅ **Crea Pedido** con items del carrito
+- ✅ **Reserva stock** (disminuye stock disponible)
+- ✅ **Calcula total** aplicando Strategy Pattern de pricing
+- ✅ **Strategy Pattern**: "precio base" vs "promo por especie perro" (15% descuento)
 - ✅ **Limpieza automática del carrito**
-- ✅ **Publicación de evento OrderCreated** (Kafka)
+- ✅ **Publica evento OrderCreated** (Kafka)
 
 ### **3. Estrategias de Pricing (Strategy Pattern)**
 - ✅ **Precio Base**: Sin descuentos
@@ -126,8 +125,8 @@ PATCH /api/v1/pedidos/{pedidoId}/estado
 ## 🎯 Reglas de Negocio Implementadas
 
 ### **Carrito**
-- ❌ No permite cantidades negativas
-- ✅ Valida existencia del producto antes de agregar
+- ❌ **No permite cantidades negativas** (regla de negocio)
+- ✅ **Valida existencia** del producto antes de agregar
 - ✅ Valida que el producto esté activo
 - ✅ Si el producto ya existe, suma las cantidades
 - ✅ Si cantidad = 0, elimina el item automáticamente
@@ -141,7 +140,8 @@ PATCH /api/v1/pedidos/{pedidoId}/estado
 - ✅ Publica evento para sistemas externos
 
 ### **Pedidos**
-- ✅ Estados válidos: CREADO → PAGADO → EN_PREPARACION → ENVIADO → ENTREGADO
+- ✅ **Estados implementados**: CREADO | PAGADO | EN_PREPARACION | ENVIADO | CANCELADO
+- ✅ **Transiciones válidas**: CREADO → PAGADO → EN_PREPARACION → ENVIADO
 - ✅ Solo se puede cancelar en estados CREADO o PAGADO
 - ✅ Al cancelar, libera el stock reservado
 - ✅ Transiciones de estado validadas

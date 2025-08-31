@@ -4,16 +4,29 @@ Marketplace de productos para mascotas implementado con **Arquitectura Hexagonal
 
 ## 🎯 Casos de Uso Implementados
 
-### **1. Catálogo de Productos**
+### **1. Catálogo**
 - ✅ Listar productos con filtros (tipo, especie, rango de precio)
-- ✅ Cache de lectura con TTL configurable
+- ✅ Cache de lectura con TTL configurable (Redis)
 - ✅ Invalidación automática al crear/actualizar productos
 
-### **2. Carrito y Pedido** 
-- ✅ Agregar/quitar ítems al carrito (validaciones SOLID)
-- ✅ Checkout: crea pedido, reserva stock, calcula total
-- ✅ Strategy Pattern para pricing (precio base vs promo perro)
+### **2. Carrito y Pedido**
+- ✅ Agregar/quitar ítems al carrito (no cantidades negativas, validar existencia)
+- ✅ Checkout: crea Pedido, reserva stock, calcula total
+- ✅ Strategy Pattern para pricing ("precio base" vs "promo perro")
 - ✅ Publica evento OrderCreated (Kafka)
+
+### **3. Inventario**
+- ✅ Al pagar pedido, confirma disminución definitiva de stock
+- ✅ Si stock < umbral, emite evento LowStock (Kafka)
+- ✅ Consumidor asíncrono crea "tarea de reposición" (PostgreSQL)
+
+### **4. Adopciones (Event-Driven)**
+- ✅ Endpoint crear SolicitudAdopción (síncrono) con validaciones
+- ✅ Publica evento AdoptionRequested (Kafka)
+- ✅ Worker asíncrono consume evento, llama servicio externo simulado
+- ✅ Publica AdoptionApproved/AdoptionRejected según verificación
+- ✅ Actualiza estado de solicitud basado en eventos
+- ✅ Notificación simulada al cliente (logs estructurados)
 
 ## 🏗️ Arquitectura
 
@@ -76,14 +89,32 @@ PATCH /api/v1/pedidos/{id}/cancelar            # Cancelar pedido
 PATCH /api/v1/pedidos/{id}/estado              # Cambiar estado
 ```
 
-## 📊 Entidades
+### Inventario
+```bash
+GET   /api/v1/inventarios/producto/{id}        # Obtener inventario
+GET   /api/v1/inventarios/stock-bajo           # Inventarios con stock bajo
+PUT   /api/v1/inventarios/producto/{id}/stock  # Actualizar stock
+POST  /api/v1/inventarios/confirmar-stock/pedido/{id} # Confirmar stock por pago
+```
 
-- **Producto** (id, nombre, tipo, especie, precio, atributos, activo)
-- **Inventario** (productoId, stock, umbralReposición)
+### Adopciones
+```bash
+POST  /api/v1/adopciones/solicitudes           # Crear solicitud
+GET   /api/v1/adopciones/solicitudes/{id}      # Obtener solicitud
+GET   /api/v1/adopciones/solicitudes/pendientes # Listar pendientes
+GET   /api/v1/adopciones/solicitudes/cliente/{id} # Por cliente
+PUT   /api/v1/adopciones/solicitudes/{id}/cancelar # Cancelar
+```
+
+## 📊 Entidades Implementadas
+
+- **Producto** (id, nombre, tipo: alimento/accesorio, especie destino, precio, atributos, activo)
+- **Inventario** (productoId, stockDisponible, umbralReposición)
 - **Cliente** (id, nombre, email)
-- **Carrito** (clienteId, ítems)
-- **Pedido** (id, clienteId, ítems, total, estado)
-- **SolicitudAdopción** (id, clienteId, mascotaIdExterna, estado)
+- **Carrito** (clienteId, ítems: productoId, cantidad)
+- **Pedido** (id, clienteId, ítems, total, estado: CREADO | PAGADO | EN_PREPARACION | ENVIADO | CANCELADO)
+- **SolicitudAdopción** (id, clienteId, tipoMascotaDeseada, estado: PENDIENTE | EN_VERIFICACION | APROBADA | RECHAZADA | CANCELADA)
+- **TareaReposición** (id, productoId, cantidadSugerida, prioridad, estado, fechaCreación)
 
 ## ⚙️ Configuración
 

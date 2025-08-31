@@ -45,6 +45,7 @@ public class PedidoMapper {
                 .clienteId(domain.getClienteId())
                 .total(domain.getTotal())
                 .estado(toEntityEstado(domain.getEstado()))
+                .direccionEnvio("Dirección por defecto") // Valor temporal hasta implementar direcciones
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
                 .build();
