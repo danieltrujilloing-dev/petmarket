@@ -43,8 +43,7 @@ public class LowStockEventConsumer {
     public void handleLowStockEvent(@Payload String eventPayload,
                                    @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                    @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-                                   @Header(KafkaHeaders.OFFSET) long offset,
-                                   Acknowledgment acknowledgment) {
+                                   @Header(KafkaHeaders.OFFSET) long offset) {
         
                 logger.info("Recibido evento LowStock - Topic: {}, Partition: {}, Offset: {}", 
                    topic, partition, offset);
@@ -69,8 +68,7 @@ public class LowStockEventConsumer {
             logger.info("Tarea de reposición creada exitosamente - ID: {}, Producto: {}, Prioridad: {}", 
                        tareaCreada.getId(), event.getProductoId(), tareaCreada.getPrioridad());
             
-            // Confirmar procesamiento del mensaje
-            acknowledgment.acknowledge();
+            // Mensaje procesado exitosamente (auto-commit habilitado)
             
             // Log adicional para eventos críticos
             if (event.esCritico()) {
@@ -87,8 +85,7 @@ public class LowStockEventConsumer {
             // 2. Implementar retry con backoff
             // 3. Alertar al equipo de operaciones
             
-            // Por ahora, no confirmamos el mensaje para que se reintente
-            // acknowledgment.acknowledge(); // Comentado para permitir retry
+            // El mensaje será reintentado automáticamente por Kafka
         }
     }
     
