@@ -98,10 +98,10 @@ curl -X PUT "http://localhost:8080/api/v1/productos/1" \
   }'
 ```
 
-### 7. Eliminar producto (soft delete)
+### 7. Desactivar/Activar producto (soft delete)
 ```bash
 # DELETE /api/v1/productos/{id}
-curl -X DELETE "http://localhost:8080/api/v1/productos/1" \
+curl -X PATCH "http://localhost:8080/api/v1/productos/1/desactivar" \
   -H "Content-Type: application/json"
 ```
 

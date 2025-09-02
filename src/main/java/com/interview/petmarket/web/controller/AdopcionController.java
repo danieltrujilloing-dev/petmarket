@@ -50,7 +50,7 @@ public class AdopcionController {
     public ResponseEntity<SolicitudAdopcionResponseDto> crearSolicitudAdopcion(
             @Valid @RequestBody CreateSolicitudAdopcionRequestDto request) {
         
-        logger.info("🐾 POST /api/v1/adopciones/solicitudes - Creando solicitud para cliente: {}", 
+        logger.info("🐾 POST /api/v1/adopciones/solicitudes - Creando solicitud observacionespara cliente: {}",
                    request.getClienteId());
         
         try {

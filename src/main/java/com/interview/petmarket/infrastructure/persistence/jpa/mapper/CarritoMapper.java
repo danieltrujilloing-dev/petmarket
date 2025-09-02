@@ -6,6 +6,7 @@ import com.interview.petmarket.infrastructure.persistence.jpa.entity.CarritoEnti
 import com.interview.petmarket.infrastructure.persistence.jpa.entity.CarritoItemEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,7 @@ public class CarritoMapper {
                 .clienteId(domain.getClienteId())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
+                .items(new ArrayList<>())
                 .build();
         
         List<CarritoItemEntity> itemEntities = domain.getItems().stream()

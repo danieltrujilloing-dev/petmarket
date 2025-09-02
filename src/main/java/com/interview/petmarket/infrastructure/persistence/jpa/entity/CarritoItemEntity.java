@@ -13,7 +13,11 @@ import java.time.LocalDateTime;
  * Entidad JPA para CarritoItem.
  */
 @Entity
-@Table(name = "carrito_items")
+@Table(name = "carrito_items",
+       uniqueConstraints = @UniqueConstraint(
+               name = "uk_carrito_producto",
+               columnNames = {"carrito_id", "producto_id"}
+       ))
 @Data
 @Builder
 @NoArgsConstructor

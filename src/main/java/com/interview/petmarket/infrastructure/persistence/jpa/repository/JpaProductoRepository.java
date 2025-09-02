@@ -59,12 +59,12 @@ public interface JpaProductoRepository extends JpaRepository<ProductoEntity, Lon
            "(:activo IS NULL OR p.activo = :activo) " +
            "AND (:tipos IS NULL OR p.tipo IN :tipos) " +
            "AND (:especies IS NULL OR p.especie IN :especies) " +
-           "AND (:precioMin IS NULL OR p.precio >= :precioMin) " +
-           "AND (:precioMax IS NULL OR p.precio <= :precioMax) " +
-           "AND (:texto IS NULL OR p.nombre LIKE CONCAT('%', :texto, '%') " +
-           "     OR p.descripcion LIKE CONCAT('%', :texto, '%')) " +
-           "AND (:soloDisponibles = false OR (p.stock IS NOT NULL AND p.stock > 0)) " +
-           "ORDER BY p.fechaActualizacion DESC")
+            "AND (:precioMin IS NULL OR p.precio >= :precioMin) " +
+            "AND (:precioMax IS NULL OR p.precio <= :precioMax) " +
+            "AND (:texto IS NULL OR LOWER(p.nombre) LIKE LOWER('%' || :texto || '%') " +
+            "     OR LOWER(p.descripcion) LIKE LOWER('%' || :texto || '%')) " +
+            "AND (:soloDisponibles = false OR (p.stock IS NOT NULL AND p.stock > 0)) " +
+            "ORDER BY p.fechaActualizacion DESC")
     List<ProductoEntity> findWithFilters(
             @Param("activo") Boolean activo,
             @Param("tipos") Set<TipoProductoEntity> tipos,
